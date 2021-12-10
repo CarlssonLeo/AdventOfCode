@@ -1,0 +1,9 @@
+"0","input <- readLines(here::here(""2015/2015/day-04-input.txt""))
+"
+"2","Warning in file(con, ""r"") :"
+"2","
+ "
+"2"," cannot open file '/Users/leocarlsson/Documents/GitHub/AdventOfCode/2015/2015/day-04-input.txt': No such file or directory
+"
+"2","Error in file(con, ""r"") : cannot open the connection
+"

@@ -1,0 +1,83 @@
+---
+title: 'Advent Of Code: 2021-04'
+author: "Tan Ho"
+date: "2021-12-07"
+output: html_document
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(here)
+  library(glue)
+  
+  knitr::opts_chunk$set(echo = TRUE)
+})
+
+options(scipen = 9999999)
+options(dplyr.summarise.inform = FALSE)
+```
+
+--- Data ---
+
+```{r eval = FALSE}
+aoc.elf::aoc_get(4)
+```
+
+```{r}
+input <- readLines(here::here("2021/2021/day-04-input.txt"))
+bingo_numbers <- input %>% `[`(1) %>% strsplit(",") %>% `[[`(1) %>% as.numeric() 
+
+boards <- tail(input,-2) %>% 
+        .[. != ""] %>% 
+        map(strsplit, " ") %>% 
+        unlist(use.names = FALSE) %>% 
+        .[. != ""] %>% 
+        as.numeric()
+
+start <- seq(1, length(boards), by=25)
+stop <-  seq(25, length(boards), by=25)
+
+into_matrix <- function(a,b) {
+        boards[a:b] %>% matrix(5,5)  
+        
+} 
+
+board_list <- map2(start, stop, into_matrix)
+```             
+
+--- Part 1 ---
+
+```{r}aoc
+check_board <- function(board){
+        for (i in seq_along(bingo_numbers)) {
+                test <- matrix(board %in% bingo_numbers[seq_len(i)], nrow = 5)
+                row_checks <- apply(test, MARGIN = 1, prod)
+                col_checks <- apply(test, MARGIN = 2, prod)
+                if (any(row_checks==1)|any((col_checks==1))) {
+                        break
+                }
+        }
+        i
+}
+
+results <- tibble(board = 1:100, board_win = board_list %>% map_int(check_board)) 
+
+winner <- results %>% 
+        filter(board_win == min(board_win))
+
+winning_board <- winner %>% pull(board)
+win_by <- winner %>% pull(board_win)
+filter <- board_list[[winning_board]] %in% bingo_numbers[1:win_by]
+sum(board_list[[winning_board]][!filter])*bingo_numbers[win_by]
+```
+
+--- Part 2 ---
+
+```{r}
+looser <- results %>% filter(board_win == max(board_win))
+loosing_board <- looser %>% pull(board)
+win_by <- looser %>% pull(board_win)
+filter <- board_list[[loosing_board]] %in% bingo_numbers[1:win_by]
+sum(board_list[[loosing_board]][!filter])*bingo_numbers[win_by]
+```

@@ -1,0 +1,90 @@
+---
+title: 'Advent Of Code: 2015-03'
+author: "Tan Ho"
+date: "2021-12-08"
+output: html_document
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(here)
+  library(glue)
+  
+  knitr::opts_chunk$set(echo = TRUE)
+})
+
+options(scipen = 9999999)
+options(dplyr.summarise.inform = FALSE)
+```
+
+--- Data ---
+
+```{r eval = FALSE}
+aoc.elf::aoc_get(3, 2015)
+```
+
+```{r}
+input <- readLines(here::here("2015/2015/day-03-input.txt"))
+input <- input %>% strsplit("") %>% `[[`(1)
+```
+
+--- Part 1 ---
+
+```{r}
+directions <- tibble(input) %>% 
+        mutate(direction = case_when(
+                input=="^" ~ "Up",
+                input== "<" ~ "Left",
+                input== ">" ~ "Right",
+                input== "v" ~ "Down"
+        )) %>% pull(direction)
+
+x_coord <- 0
+y_coord <- 0 
+path <- "0,0"
+for (i in seq_along(directions)) {
+        if (directions[i] == "Up") x_coord <- x_coord+1
+        if (directions[i] == "Down") x_coord <- x_coord-1
+        if (directions[i] == "Right") y_coord <- y_coord+1
+        if (directions[i] == "Left") y_coord <- y_coord-1
+        path[i+1] <- paste0(x_coord, ",", y_coord)
+        
+}
+length(unique(path))
+```
+
+--- Part 2 ---
+
+
+```{r}
+santa_directions <- directions[seq_along(directions) %% 2==1]
+robot_directions <- directions[seq_along(directions) %% 2==0]
+
+x_coord <- 0
+y_coord <- 0 
+santa_path <- "0,0"
+for (i in seq_along(santa_directions)) {
+        if (santa_directions[i] == "Up") x_coord <- x_coord+1
+        if (santa_directions[i] == "Down") x_coord <- x_coord-1
+        if (santa_directions[i] == "Right") y_coord <- y_coord+1
+        if (santa_directions[i] == "Left") y_coord <- y_coord-1
+        santa_path[i+1] <- paste0(x_coord, ",", y_coord)
+        
+}
+
+x_coord <- 0
+y_coord <- 0 
+robot_path <- "0,0"
+for (i in seq_along(robot_directions)) {
+        if (robot_directions[i] == "Up") x_coord <- x_coord+1
+        if (robot_directions[i] == "Down") x_coord <- x_coord-1
+        if (robot_directions[i] == "Right") y_coord <- y_coord+1
+        if (robot_directions[i] == "Left") y_coord <- y_coord-1
+        robot_path[i+1] <- paste0(x_coord, ",", y_coord)
+        
+}
+length(unique(c(santa_path, robot_path)))
+```
+
+

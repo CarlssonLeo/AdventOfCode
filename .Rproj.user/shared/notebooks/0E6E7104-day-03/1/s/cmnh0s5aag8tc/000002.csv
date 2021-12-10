@@ -1,0 +1,7 @@
+"0","input <- readLines(here::here(""2015/2015/day-03-input.txt""))
+"
+"2","Warning in readLines(here::here(""2015/2015/day-03-input.txt"")) :"
+"2","
+ "
+"2"," incomplete final line found on '/Users/leocarlsson/Documents/GitHub/AdventOfCode/2015/2015/day-03-input.txt'
+"

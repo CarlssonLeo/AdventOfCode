@@ -1,0 +1,7 @@
+"0","sum(setdiff(slowest_board, numbers[seq_len(slowest_time)])) *
+  numbers[slowest_time]
+"
+"1","[1]"
+"1"," 36975"
+"1","
+"

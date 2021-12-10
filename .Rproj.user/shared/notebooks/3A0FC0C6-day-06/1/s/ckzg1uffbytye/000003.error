@@ -1,0 +1,1 @@
+{"frames":[{"func":"data.frame(data = (max_day_original + 1):first_reproduction, \n    Freq = 0)","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error in data.frame(data = (max_day_original + 1):first_reproduction,  : \n  object 'first_reproduction' not found\n"}

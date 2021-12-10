@@ -1,0 +1,92 @@
+---
+title: 'Advent Of Code: 2021-08'
+author: "Tan Ho"
+date: "2021-12-08"
+output: html_document
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(here)
+  library(glue)
+  
+  knitr::opts_chunk$set(echo = TRUE)
+})
+
+options(scipen = 9999999)
+options(dplyr.summarise.inform = FALSE)
+```
+
+--- Data ---
+
+```{r eval = FALSE}
+aoc.elf::aoc_get(8)
+```
+
+```{r}
+input <- readLines(here::here("2021/2021/day-08-input.txt"))
+output_values <- input %>% str_remove(".+\\| ") %>% 
+        str_split(" ") 
+input_values <- input %>% 
+        str_extract(".+\\|") %>% 
+        str_remove(" \\|") %>% 
+        str_split(" ") 
+
+```
+
+--- Part 1 ---
+
+```{r}
+output_values <- tibble(x= output_values) %>% 
+        mutate(segment=1:n()) %>% 
+        unnest(x) %>% 
+        mutate(str_length = nchar(x)) %>% 
+        mutate(number = case_when(
+                str_length == 2 ~ 1,
+                str_length == 4 ~ 4,
+                str_length == 3 ~ 7,
+                str_length == 7 ~ 8
+        )) 
+
+output_values %>% 
+        count(number) %>% 
+        filter(!is.na(number)) %>% 
+        summarise(sum(n))
+```
+
+--- Part 2 ---
+
+```{r}
+output_values
+
+list(
+    "0" = c(top,top_right, top_left,bottom_left,bottom_right,bottom),
+    "1" = c(top_right, bottom_right),
+    "2" = c(top, top_right, middle, bottom_left, bottom),
+    "3" = c(top, top_right, middle, bottom_right, bottom),
+    "4" = c(top_left, top_right, middle, bottom_right),
+    "5" = c(top, top_left, middle, bottom_right, bottom),
+    "6" = c(top, top_left, middle, bottom_left, bottom_right, bottom),
+    "7" = c(top, top_right, bottom_right),
+    "8" = c(top, top_left, top_right, middle, bottom_left,bottom_right,bottom),
+    "9" = c(top, top_left, top_right, middle, bottom_right,bottom)
+  ) 
+
+p <- list()
+p$`0` <- c('a','b','c','e','f','g')
+p$`1` <- c('c','f')
+p$`2` <- c('a','c','d','e','g')
+p$`3` <- c('a', 'c', 'd', 'f', 'g')
+p$`4` <- c('b', 'c', 'd', 'f')
+p$`5` <- c('a', 'b', 'd', 'f', 'g')
+p$`6` <- c('a', 'b', 'd', 'e', 'f' , 'g')
+p$`7` <- c('a', 'c', 'f')
+p$`8` <- c('a','b','c','d','e','f','g')
+p$`9` <- c('a','b','c','d','f','g')
+
+pc <- purrr::map(p, paste0, collapse = "")
+pc2 <- names(pc)
+names(pc2) <- pc
+```
+

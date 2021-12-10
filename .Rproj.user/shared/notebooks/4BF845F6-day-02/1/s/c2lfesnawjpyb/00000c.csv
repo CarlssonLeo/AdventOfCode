@@ -1,0 +1,6 @@
+"0","sum(vapply(chars, ribbon_length, numeric(1)))
+"
+"1","[1]"
+"1"," 74550"
+"1","
+"

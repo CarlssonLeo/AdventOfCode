@@ -1,0 +1,7 @@
+"0","sum(setdiff(fastest_board, numbers[seq_len(fastest_time)])) *
+  numbers[fastest_time]
+"
+"1","[1]"
+"1"," 27027"
+"1","
+"
