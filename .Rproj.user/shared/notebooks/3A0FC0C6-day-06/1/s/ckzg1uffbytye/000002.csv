@@ -1,5 +1,0 @@
-"0","additional_days <- data.frame(data = (max_day_original + 1):first_reproduction, Freq = 0)
-"
-"2","Error in data.frame(data = (max_day_original + 1):first_reproduction,  : 
-  object 'first_reproduction' not found
-"

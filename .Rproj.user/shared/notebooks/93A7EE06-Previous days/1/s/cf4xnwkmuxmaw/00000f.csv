@@ -1,5 +1,0 @@
-"0","input <- read_tsv(""input.txt"", show_col_types = FALSE) %>% pull(value)
-"
-"2","Error: object 'value' not found
-[90mRun `rlang::last_error()` to see where the error occurred.[39m
-"

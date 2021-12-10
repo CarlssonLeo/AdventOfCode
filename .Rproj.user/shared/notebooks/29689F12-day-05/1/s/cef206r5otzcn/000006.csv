@@ -1,8 +1,0 @@
-"0","data %>%
-  filter(!(x1 == x2 | y1 == y2)) %>% 
-  unnest(x,y) %>% 
-  bind_rows(coordinates) %>% 
-  count(x,y) %>% summarise(sum(n>1))
-"
-"2","unnest() has a new interface. See ?unnest for details.
-Try `df %>% unnest(c(x, y))`, with `mutate()` if needed"

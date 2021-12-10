@@ -1,8 +1,0 @@
-"0","cleaned[!filter] %>% map_chr(completer) %>% 
-        map_dbl(completion_pointer) %>% 
-        median()
-"
-"1","[1]"
-"1"," 1605968119"
-"1","
-"
