@@ -48,7 +48,8 @@ board_list <- map2(start, stop, into_matrix)
 
 --- Part 1 ---
 
-```{r}aoc
+```{r}
+
 check_board <- function(board){
         for (i in seq_along(bingo_numbers)) {
                 test <- matrix(board %in% bingo_numbers[seq_len(i)], nrow = 5)
