@@ -32,7 +32,7 @@ input <- readLines(here::here("2015/2015/day-04-input.txt"))
 
 ```{r}
 md5 <- digest::getVDigest()
-tibble(input =paste0(input, c(1:10000000))) %>% 
+tibble(input =paste0(input, c(5000000:10000000))) %>% 
         mutate(output = md5(input, serialize = FALSE)) %>% 
         filter(str_starts(output, "000000"))
 ```
