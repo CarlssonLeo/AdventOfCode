@@ -1,0 +1,72 @@
+---
+title: 'Advent Of Code: 2021-14'
+author: Leo Carlsson
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(here)
+  library(glue)
+  
+  knitr::opts_chunk$set(echo = TRUE)
+})
+
+options(scipen = 9999999)
+options(dplyr.summarise.inform = FALSE)
+```
+
+--- Data ---
+
+```{r eval = FALSE}
+# tanho63/aoc.elf
+aoc.elf::aoc_get(day = 14, year = 2021)
+```
+
+```{r}
+input <- readLines(here::here("2021/day-14-input.txt"))
+start <- input[[1]]
+
+# Make a tibble with the original pairs, and then how the pairs look after replacement. Ie, BN inserts C, and thus becomes BC and NC.
+rules <- tibble(x = input) %>% slice(-c(1:2)) %>%
+        separate(x, into = c("pair", "insert"), sep = " -> ") %>% 
+        mutate(pair1 = paste0(str_sub(pair, 1, 1), insert),
+               pair2 = paste0(str_sub(pair, 2, 2), insert))
+
+#All unique pair. So if an insert creates another pair that already exists, it only count once.
+pairs <- unique((c(rules$pair, rules$pair1, rules$pair2)))
+
+# Make a starting matrix. First filled with 0's, then add one in the intersecton between 
+# pairs in pair and pair1, and then again in intersection between pairs and pair2. 
+m <- matrix(0, length(pairs), length(pairs), dimnames = list(pairs, pairs))
+m[cbind(rules$pair, rules$pair1)] <-  1
+m[cbind(rules$pair, rules$pair2)] <- m[cbind(rules$pair, rules$pair2)] + 1 
+
+# First, count each pair in the starting string. 
+library(expm)
+start_count <-  str_count(start, pairs)
+
+# Then, matrix multiply that with the matrix exponentiation
+frequencies <- start_count %*% (m %^% 40)
+
+tibble(n = c(frequencies),
+       pair = colnames(frequencies)) %>% 
+        group_by(second = str_sub(pair, 2, 2)) %>% 
+        summarise(n = sum(n)) %>% 
+        summarise(solution = diff(range(n)))
+```
+
+--- Part 1 ---
+
+```{r}
+
+```
+
+--- Part 2 ---
+
+```{r}
+
+```
+

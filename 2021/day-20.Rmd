@@ -1,0 +1,132 @@
+---
+title: 'Advent Of Code: 2021-20'
+author: Leo Carlsson
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(here)
+  library(glue)
+  
+  knitr::opts_chunk$set(echo = TRUE)
+})
+
+options(scipen = 9999999)
+options(dplyr.summarise.inform = FALSE)
+```
+
+--- Data ---
+
+```{r eval = FALSE}
+aoc.elf::aoc_get(day = 20, year = 2021)
+```
+
+```{r}
+input <- readLines(here::here("2021/day-20-input.txt"))
+
+example <- c("..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..##", "#..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###", ".######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#.", ".#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#.....", ".#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#..", "...####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.....", "..##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#",
+              "#..#.", "#....", "##..#", "..#..", "..###") 
+
+example_input <- example[8:12] |> 
+  strsplit("") |> 
+  unlist() |> 
+  matrix(5,5, byrow = TRUE)
+
+example_key <- example[1:7] |> 
+  strsplit("") |> 
+  unlist()
+```
+
+--- Part 1 ---
+
+```{r}
+matrix_around <- function(x) {
+        row <- x[1]
+        col <- x[2]
+        row_id <- c(row - 1, row - 1, row - 1, row, row + 1, row + 1, row + 1, row)
+        col_id <- c(col - 1, col, col + 1, col + 1, col + 1, col, col - 1, col - 1)
+        subset <- !(row_id > size | col_id > size)
+        cbind(row_id[subset], col_id[subset])
+}
+
+```
+
+--- Part 2 ---
+
+```{r}
+
+```
+
+
+--- tidy version
+```{r}
+library(adventdrob)
+
+input <- advent_input(20)
+
+enhancement <- str_split(input$x[1], "")[[1]]
+
+grid <- input |> 
+  slice(-(1:2)) |> 
+  grid_tidy(x)
+
+# tidy_input <- tibble(x = example[8:12] |> 
+#          str_split("")) |> 
+#   mutate(row = row_number()) |> 
+#   unnest(x) |>
+#   group_by(row) |> 
+#   mutate(col = row_number())
+
+as_number <- function(x) {
+  spl <- str_split(x, "")[[1]]
+  binary <- spl == "#"
+  number = sum(binary * 2^seq(length(binary) - 1, 0))
+}
+
+step  <- function(g, iteration) {
+  border_symbol <- if (iteration %% 2 == 0) "#" else "."
+  
+  borders <- crossing(row = seq(min(g$row) - 2, max(g$row) + 2),
+                     col = seq(min(g$col) - 2, max(g$col) + 2),
+                     value = border_symbol)  |> 
+    anti_join(g, by = c("row", "col"))
+  
+  g |> 
+    bind_rows(borders) |> 
+    adventdrob::adjacent_join(diagonal = TRUE) |> 
+    group_by(row, col, value) |> 
+    summarise(combined = paste0(value2, collapse = ""),
+              .groups = "drop") |> 
+    #filter(str_length(combined) == 9) |> 
+    mutate(number = map_dbl(combined, as_number),
+              value = enhancement[number + 1])
+}
+
+reduce(c(1:3), step, .init = grid)
+reduce(1:2, step, .init = grid)
+
+part1 |> 
+  summarise(sum(value == "#"))
+```
+
+```{r}
+tidy_input %>%
+    ggplot(aes(x = col, y = row)) +
+    geom_raster(aes(fill = x)) +
+    scale_fill_manual(values = c("#636363", "#f0f0f0")) +
+    scale_y_reverse() +
+    coord_equal() +
+    theme_void() +
+    theme(legend.position = "none")
+```
+
+```{r}
+g |> 
+    bind_rows(borders) |> 
+    adventdrob::adjacent_join(diagonal = TRUE) |> 
+  nest(data = c(row2, col2, value2))
+```
+

@@ -1,0 +1,211 @@
+---
+title: 'Advent Of Code: 2021-24'
+author: Leo Carlsson
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(here)
+  library(glue)
+  
+  knitr::opts_chunk$set(echo = TRUE)
+})
+
+options(scipen = 9999999)
+options(dplyr.summarise.inform = FALSE)
+```
+
+--- Data ---
+
+```{r eval = FALSE}
+aoc.elf::aoc_get(day = 24, year = 2021)
+```
+
+```{r}
+input <- readLines(here::here("2021/day-24-input.txt"))[1:18] 
+
+tibble(x = input) |> 
+  separate(x, sep = " ", into = c("operation", "value1", "value2"))
+input
+```
+
+
+
+
+Write a short program that prints each number from 1 to 100 on a new line. 
+
+For each multiple of 3, print "Fizz" instead of the number. 
+
+For each multiple of 5, print "Buzz" instead of the number. 
+
+For numbers which are multiples of both 3 and 5, print "FizzBuzz" instead of the number.
+
+```{r}
+FizzBuzz <- function(input) {
+  if (input %% 3 == 0  & input %% 5 == 0) return("FizzBuzz")
+  else if (input %% 3 == 0 ) return("Fizz")
+  else if (input %% 5 == 0) return("Buzz")
+  else return(as.character(input))
+}
+
+lapply(1:100, FizzBuzz)
+```
+
+
+```{r}
+FizzBuzz <- function(input) {
+  if (input %% 3 == 0  & input %% 5 == 0) print("FizzBuzz")
+  else if (input %% 3 == 0 ) print("Fizz")
+  else if (input %% 5 == 0) print("Buzz")
+  else print(as.character(input))
+}
+
+sapply(1:100, FizzBuzz)
+
+for (i in 1:100) {
+  FizzBuzz(i)
+}
+```
+
+TwoSum
+Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+Example 1:
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Output: Because nums[0] + nums[1] == 9, we return [0, 1].
+Example 2:
+
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+
+
+```{r}
+twoSum <- function(numbers, target) {
+  for (i in seq_along(numbers)) {
+    for (j in seq_along(numbers)) {
+      test <- numbers[i] + numbers[j] == target
+      if (test) {
+        return(c(i, j))
+      }
+    }
+  }
+}
+nums <- c(2,7,11,15)
+target <- 9
+
+twoSum(nums, target)
+```
+
+Gives correct!  But, it does not handle them two same numbers. ie, 
+```{r}
+nums <- c(3,2,4)
+target <- 6
+
+twoSum(nums, target)
+```
+
+Change so we test if 
+
+```{r}
+twoSum <- function(numbers, target) {
+  for (i in seq_along(numbers)) {
+    for (j in seq_along(numbers)) {
+      test <- numbers[i] + numbers[j] == target & i != j
+      if (test) {
+        return(c(i, j))
+      }
+    }
+  }
+}
+
+twoSum(nums, target)
+```
+
+```{r}
+map_twosum <- function(numbers, target) {
+  map_int(seq_along(numbers), 
+          ~print(numbers[.x])
+  )
+}
+
+map_twosum(nums, target)
+```
+
+
+```{r}
+twosum <- function(.x, nums = numbers, target = target) {
+    comp <- target - nums[.x] 
+    if (comp %in% nums) {
+      first <- .x
+      second <- which(nums %in% comp)
+      return(c(first, second))
+    } else return(NULL)
+  }
+
+map_twosum <- function(numbers, target) {
+  map(seq_along(numbers), ~twosum(.x, nums = numbers, target = target)
+  )
+}
+
+map_twosum(nums, target)
+
+```
+
+
+```{r}
+nums = c(3,3)
+target = 6
+twoSum(nums, target)
+```
+
+Product of array execpt self
+
+Input: nums = [1,2,3,4]
+Output: [24,12,8,6]
+```{r}
+ProductArray <- function(nums) {
+  index <- seq_along(nums)
+  
+  map(index, ~prod(nums[-.x])) |> unlist()
+}
+
+nums <-  c(1,2,3,4)
+expexted_output <- c(24,12,8,6)
+output <- ProductArray(nums)
+all(output == expexted_output)
+
+nums <- c(-1,1,0,-3,3)
+expexted_output <- c(0,0,9,0,0)
+output <- ProductArray(nums)
+all(output == expexted_output)
+```
+
+
+```{r}
+nums <- c(1,2,3,4, 1,2,3,4,1,2,3,4, 1,2,3,4,1,2,3,4, 1,2,3,4,1,2,3,4, 1,2,3,4, 1,2,3,4, 1,2,3,4,1,2,3,4, 1,2,3,4,1,2,3,4, 1,2,3,4,1,2,3,4, 1,2,3,4)
+```
+
+
+```{r}
+tictoc::tic()
+output <- ProductArray(nums)
+tictoc::toc()
+```
+
+```{r}
+tictoc::tic()
+output <- c()
+for (i in seq_along(nums)) {
+  output <- c(output, prod(nums[-i]))
+}
+tictoc::toc()
+```
+

@@ -32,36 +32,14 @@ input <- readLines(here::here("2015/2015/day-04-input.txt"))
 
 ```{r}
 md5 <- digest::getVDigest()
-tibble(input =paste0(input, c(5000000:10000000))) %>% 
+tibble(input =paste0(input, c(1:1000000))) %>% 
+        mutate(output = md5(input, serialize = FALSE)) %>% 
+        filter(str_starts(output, "00000"))
+```
+
+```{r}
+tibble(input =paste0(input, c(9000000:10000000))) %>% 
         mutate(output = md5(input, serialize = FALSE)) %>% 
         filter(str_starts(output, "000000"))
-```
-
-
-```{r}
-input <- "iwrupvqb"
-number <- seq_len(1000000)
-
-md5 <- digest::getVDigest()
-
-hash <- vapply(
-  paste0(input, number),
-  md5,
-  FUN.VALUE = character(1),
-  serialize = FALSE
-)
-
-which(substr(hash, 1, 5) == "00000")
-```
-
-```{r}
-input2 <- "iwrupvqb346386"
-md5("iwrupvqb346386", serialize = FALSE)
-```
-
---- Part 2 ---
-
-```{r}
-
 ```
 

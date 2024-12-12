@@ -10,7 +10,7 @@ suppressPackageStartupMessages({
         library(tidyverse)
         library(here)
         library(glue)
-        
+        library(tidygraph)
         knitr::opts_chunk$set(echo = TRUE)
 })
 
@@ -48,40 +48,40 @@ example <- example %>%
 
 ```{r}
 check_adjecent <- function(element) {
-        output_matrix <- matrix(nrow=nrow(element), ncol=ncol(element))
+        output_matrix <- matrix(nrow = nrow(element), ncol=ncol(element))
         for (row in 1:nrow(element)) {
                 for (col in 1:ncol(element)) {
-                        if (col==1 & row==1) {
+                        if (col == 1 & row==1) {
                                 #First element, first row
-                                right <- element[row, col+1] > element[row, col]#element to the right
-                                below <- element[row+1, col] > element[row, col]#element below
+                                right <- element[row, col + 1] > element[row, col]#element to the right
+                                below <- element[row + 1, col] > element[row, col]#element below
                                 test <- all(right, below)
-                        } else if (col==1 & row !=nrow(element)) {
+                        } else if (col==1 & row != nrow(element)) {
                                 #first column, every element but the last
-                                right <- element[row, col+1] > element[row, col] #element to the right
-                                below <- element[row+1, col] > element[row, col] #element below
-                                above <- element[row-1, col] > element[row, col] #element above
+                                right <- element[row, col + 1] > element[row, col] #element to the right
+                                below <- element[row + 1, col] > element[row, col] #element below
+                                above <- element[row - 1, col] > element[row, col] #element above
                                 test <- all(right, below, above)
-                        } else if (col==1 & row == nrow(element)) {
+                        } else if (col == 1 & row == nrow(element)) {
                                 #first element, last row
-                                right <- element[row, col+1] > element[row, col] #element to the right
-                                above <- element[row-1, col] > element[row, col] #element above 
+                                right <- element[row, col + 1] > element[row, col] #element to the right
+                                above <- element[row - 1, col] > element[row, col] #element above 
                                 test <- all(right, above)
-                        } else if (row==1 & col !=ncol(element)) {
+                        } else if (row == 1 & col != ncol(element)) {
                                 #first row, not last element
-                                right <- element[row, col+1] > element[row, col] #element to the right
-                                left <- element[row,col-1] > element[row, col] #element to the left
-                                below <- element[row+1, col] > element[row, col] #element below
+                                right <- element[row, col + 1] > element[row, col] #element to the right
+                                left <- element[row,col - 1] > element[row, col] #element to the left
+                                below <- element[row + 1, col] > element[row, col] #element below
                                 test <- all(right, left, below)
-                        } else if (row==1 & col == ncol(element)) {
+                        } else if (row == 1 & col == ncol(element)) {
                                 #last element of first row
-                                left <- element[row,col-1] > element[row, col] #element to the left
-                                below <- element[row+1, col] > element[row, col] #element below
+                                left <- element[row,col - 1] > element[row, col] #element to the left
+                                below <- element[row + 1, col] > element[row, col] #element below
                                 test <- all(left, below)
-                        } else if (row==nrow(element) & col == ncol(element)) {
+                        } else if (row == nrow(element) & col == ncol(element)) {
                                 #last element of last row
-                                above <- element[row-1, col] > element[row, col] #element above 
-                                left <- element[row,col-1] > element[row, col] #element to the left
+                                above <- element[row - 1, col] > element[row, col] #element above 
+                                left <- element[row,col - 1] > element[row, col] #element to the left
                                 test <- all(above, left)
                         } else if (col == ncol(element) & row != 1 & row != nrow(element)) {
                                 #last col
@@ -117,23 +117,32 @@ sum(res+1)
 --- Part 2 ---
 
 ```{r}
-row <- 1
-col <- 1
+tg <- tibble(x=input) %>% 
+        mutate(row = row_number(),
+               value = str_split(x, "")) %>% 
+        unnest(value) %>% 
+        select(-x) %>% 
+        group_by(row) %>% 
+        mutate(col = row_number())
 
-row_length <- nrow(example)
-col_length <- ncol(example)
 
-mat <- matrix(FALSE, row_length, col_length)
-row_id <- c(row + 1, row, row - 1, row)
-col_id <- c(col, col + 1, col, col - 1)
+basins <- create_lattice(c(100, 100), directed = TRUE, mutual = TRUE) %>% 
+        mutate(!!!tg) %>% 
+        filter(value != 9) %>% 
+        mutate(basin = group_components()) %>% 
+        as_tibble()
+basins %>% 
+        count(basin, sort = TRUE) %>% 
+        slice_min(basin, n=3, with_ties = FALSE) %>% 
+        pull(n) %>% 
+        prod()
 
-subset <- !(row_id > nrow(example) | col_id > ncol(example))
-
-row_id <- row_id[subset]
-col_id <- col_id[subset]
-if (all(example[cbind(row_id, col_id)] > example[row, col])) {
-      mat[row, col] <- TRUE
-}
-mat
+basins %>% 
+        ggplot(aes(col, row)) +
+        geom_point(aes(color = basin)) +
+        scale_y_reverse() +
+        scale_x_continuous(position = "top") +
+        coord_equal()
 ```
+
 

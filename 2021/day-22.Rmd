@@ -1,0 +1,83 @@
+---
+title: 'Advent Of Code: 2021-22'
+author: Leo Carlsson
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(here)
+  library(glue)
+  
+  knitr::opts_chunk$set(echo = TRUE)
+})
+
+options(scipen = 9999999)
+options(dplyr.summarise.inform = FALSE)
+```
+
+--- Data ---
+
+```{r eval = FALSE}
+# tanho63/aoc.elf
+aoc.elf::aoc_get(day = 22, year = 2021)
+```
+
+```{r}
+input <- readLines(here::here("2021/day-22-input.txt"))
+```
+
+--- Part 1 ---
+```{r}
+input <- tibble(x = input) |> 
+  mutate(state = str_extract(x, "\\w{2,}")) |> 
+  separate(x, into = c("x", "y", "z"), sep = ",") |> 
+  mutate(row = row_number()) |> 
+  pivot_longer(-c(row, state), names_to = "coordinate") |> 
+  mutate(value = str_remove(value, "\\w{2,} "),
+         value = str_remove(value, "\\w=")) |> 
+  separate(value, into = c("from", "to"), sep = "\\.\\.", convert = TRUE) |> 
+  mutate(from = from + 51,
+         to = to + 51) |> 
+  rowwise() |>  
+  mutate(grid = list(seq(from, to))) |> 
+  ungroup() |> 
+  select(-from, -to) |> 
+  pivot_wider(names_from = coordinate, values_from = grid)
+
+
+result <- array(FALSE, dim = c(101, 101, 101))
+
+for (row in input$row) {
+  x <- input$x[[row]]
+  y <- input$y[[row]]
+  z <- input$z[[row]]
+  state <- input$state[[row]] == "on"
+  print(row)
+  
+  for (x_i in seq_along(x)) {
+    if (x[x_i] > 0 & x[x_i] <= 101) {
+      for (y_i in seq_along(y)) {
+        if (y[y_i] > 0 & y[y_i] <= 101) {
+          for (z_i in seq_along(z)) {
+            if (z[z_i] > 0 & z[z_i] <= 101) {
+              result[x[x_i], y[y_i], z[z_i]] <-  state
+            }
+          }
+        }
+      }
+    }
+  }
+}
+sum(result)
+```
+
+--- Part 2 ---
+
+```{r}
+
+```
+
+

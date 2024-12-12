@@ -1,0 +1,167 @@
+---
+title: 'Advent Of Code: 2021-13'
+author: Leo Carlsson
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+        library(tidyverse)
+        library(here)
+        library(glue)
+        
+        knitr::opts_chunk$set(echo = TRUE)
+})
+
+options(scipen = 9999999)
+options(dplyr.summarise.inform = FALSE)
+```
+
+--- Data ---
+
+```{r eval = FALSE}
+aoc.elf::aoc_get(day = 13, year = 2021)
+```
+
+```{r}
+input <- readLines(here::here("2021/day-13-input.txt"))
+folds <- input %>% 
+        str_subset("fold") %>% 
+        str_remove("fold along ") %>% 
+        tibble(x = .) %>% 
+        separate(x, into = c("axis", "index"), sep = "=", convert = TRUE)
+
+dots <- input %>% 
+        str_subset("fold", negate = TRUE) %>% 
+        tibble(x=.) %>% 
+        separate(x, 
+                 into = c("x", "y"), 
+                 sep=",",
+                 convert = TRUE) %>% 
+        filter(!is.na(x))
+
+example_dots <- tibble::tribble(
+        ~x, ~y,
+        6L, 10L,
+        0L, 14L,
+        9L, 10L,
+        0L,  3L,
+        10L,  4L,
+        4L, 11L,
+        6L,  0L,
+        6L, 12L,
+        4L,  1L,
+        0L, 13L,
+        10L, 12L,
+        3L,  4L,
+        3L,  0L,
+        8L,  4L,
+        1L, 10L,
+        2L, 14L,
+        8L, 10L,
+        9L,  0L
+)
+
+example_dots %>% 
+        ggplot(aes(x, y))+
+        geom_point()+
+        scale_y_reverse()+
+        coord_fixed()+ 
+        theme(
+                axis.title.x = element_blank(),
+                axis.title.y = element_blank(),
+                axis.text.x = element_blank(),
+                axis.text.y = element_blank()
+        )
+```
+
+--- Part 1 ---
+
+Switch-logic stolen from Tan! 
+```{r}
+fold_x <- function(dots, index) {
+        dots %>% 
+                mutate(x=if_else(x>index, index-(x-index), x)) %>% 
+                distinct()
+}
+
+fold_y <- function(dots, index) {
+        dots %>% 
+                mutate(y=if_else(y>index, index-(y-index), y)) %>% 
+                distinct()
+}
+
+fold <- function(dots, index, direction) {
+        switch(direction,
+               "x" = dots <- fold_x(dots, index),
+               "y" = dots <- fold_y(dots, index),
+               stop()
+        )
+        return(dots)
+}
+
+fold2 <- function(d, axis, index) {
+        d[[axis]]=ifelse(d[[axis]]>index, 
+                         index-(d[[axis]]-index), 
+                         d[[axis]])
+        return(distinct(d))
+}
+```
+
+--- Part 2 ---
+
+```{r}
+tictoc::tic()
+reduce2(folds$axis, folds$index, fold2, .init = dots) %>% 
+        ggplot(aes(x, y))+
+        geom_point(shape=15, size=6)+
+        scale_y_reverse()+
+        coord_fixed()+ 
+        theme(
+                axis.title.x = element_blank(),
+                axis.title.y = element_blank(),
+                axis.text.x = element_blank(),
+                axis.text.y = element_blank()
+        )
+tictoc::toc()
+```
+```{r}
+tictoc::tic()
+reduce2(folds$index, folds$axis, fold, .init = dots) %>% 
+        ggplot(aes(x, y))+
+        geom_point(shape=15, size=6)+
+        scale_y_reverse()+
+        coord_fixed()+ 
+        theme(
+                axis.title.x = element_blank(),
+                axis.title.y = element_blank(),
+                axis.text.x = element_blank(),
+                axis.text.y = element_blank()
+        )
+tictoc::toc()
+```
+```{r}
+fold <- function(d,axis,index){
+  d$tmp <- index - d[[axis]]
+  d[[axis]] <- ifelse(d$tmp <0,d$tmp + index, d[[axis]])
+  d$tmp <- NULL
+  return(distinct(d))
+}
+
+tictoc::tic()
+reduce2(folds$axis, folds$index, fold, .init = dots) %>% 
+        ggplot(aes(x, y))+
+        #geom_point(shape=15, size=6)+
+        geom_tile()+
+        scale_y_reverse()+
+        coord_fixed()+ 
+        theme(
+                axis.title.x = element_blank(),
+                axis.title.y = element_blank(),
+                axis.text.x = element_blank(),
+                axis.text.y = element_blank()
+        )
+tictoc::toc()
+```
+
